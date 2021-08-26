@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+    type: backend
+
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 8080
+      resources: #for each container in the pod
+        request:
+          memory: "1Gi"
+          cpu: 100mi
+        limits:
+          memory: "2Gi"
+          cpu: 200mi
+
+  tolerations:
+    - effect: "NoSchedule"
+      key: "app" #kubectl taint nodes node1 app= blue:NoSchedule
+      operator: "Equal"
+      value: "blue"
+
+  nodeSelector:
+    size: Large #label on the node
+
+  affinity: #the same condition as nodeSelector
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: #preffered....
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: size
+                operator: In #NotIn, Exists
+                values:
+                  - Large
+---
+apiVersion: v1
+kind: LimitRange #set default values for the pod containers
+metadata:
+  name: mem-limit-range
+  labels:
+    app: pod
+spec:
+  containers:
+  - name: resources
+    resources:
+      limits:
+        memory: "512Mi"
+        cpu: "1000m"
+      requests:
+        memory: "256Mi"
+        cpu: "500m"
+

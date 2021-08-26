@@ -1,0 +1,91 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    env : deployment
+    app : nginx-deployment
+    tier: backend
+spec:
+  replicas: 4 
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+  containers:
+    - name: nginx
+      image: nginx:1.14.2
+      ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    env: deployment
+    app: httpd
+    tier: backend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+  containers:
+    - name: httpd
+      image: httpd:2.4
+      ports:
+        - containerPort: 80
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2betav1
+    kind: Deployment
+    name: nginx-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 30
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 40
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: httpd-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2betav1
+    kind: Deployment
+    name: httpd-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 30
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 40  
+
+  
+    

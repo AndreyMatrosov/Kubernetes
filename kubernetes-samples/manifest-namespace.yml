@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+---
+apiVersion: v1
+kind: ResourceQuota
+matadata:
+  name: compute-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "4"
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp: service
+spec:
+  type: NodePort
+  ports:
+    - targetport: 80 # pod port
+      port: 80 # service output port
+      nodeport: 80 # external node port
+  selector:
+    app: myapp
+    type: front-end
+---
+apiVersion: v1
+kind: Service
+metadata:
+  label:
+    app: back-end
+    type: backend
+spec:
+  type: ClusterIP
+  ports:
+    - targetPort: 80 #backend exposes
+      port: 80 #service exposes
+  selector:
+    app: myapp
+    type: back-end
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  type: back-end
+spec:
+  type: LoadBalancer # if a platform doesn't support loadbalancer (like VB for example),
+                     # it'll use NodePort instead loadbalancer
+  ports:
+    - targetPort: 80
+      port: 80
+      nodePort: 30009
+
+

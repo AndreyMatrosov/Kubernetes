@@ -1,0 +1,52 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: hostpath2
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  reclaimPolicy:
+    - Recycle
+  hostPath:
+    path: "/tmp/data1"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+   type: pod
+spec:
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      volumeMounts:
+        - mountPath: /var/www/html
+          name: local-pvc
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+        
+  volumes:
+    - name: local-pvc
+      persistentVolumeClaim:
+        claimName: local-pvc
+  
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pvc
+spec:
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce

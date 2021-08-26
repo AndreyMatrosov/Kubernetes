@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-vol
+  labels:
+    name: pod-vol
+spec:
+  containers:
+  - name: alpine
+    image: alpine
+    command:
+      - "/bin/sh"
+      - "-c"
+    args:
+      - "shuf -i 0-100 -n 1 >> /opt/number.out;"
+    volumeMounts:
+      - mountPath: /opt
+        name: aws-volume
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+    ports:
+      - containerPort: 8080
+  
+  volumes:
+    - name: data-volume
+      hostPath:
+        path: /data
+        type: Directory
+    - name: aws-volume
+      awsElasticBlockStore:
+        volumeID: arn:aws:s3:::demo-k8s-cka
+        fsType: ext4
+    - name: pvc-volume
+      persistentVolumeClaim:
+        claimName: pvc-voll
+    - name: aws-sc-voll
+      persistentVolumeClaim:
+        claimName: pvc-aws-voll   

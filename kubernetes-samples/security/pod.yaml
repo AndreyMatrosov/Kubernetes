@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    name: myapp
+spec:
+  securityContext: # on the POD level
+    runAsUser: 1000
+  containers:
+  - name: myapp
+    image: nginx
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
+    securityContext:
+      runAsUser: 1000
+      capabilities:  # only on the container level     
+        add: ["MAC_ADMIN"]

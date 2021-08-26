@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: ubuntu-sleeper-pod
+  labels:
+    tier: pod
+spec:
+  containers:
+  - name: ubuntu-sleeper
+    image: ubuntu-sleeper
+   # command: ["sleep", "5000"]
+    command: # entrypoint in dockerfile
+      - sleep
+      - "50000"
+    args: ["10"] #cmd in dockrefile
+
+
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 8080
+    env: 
+    #from secrets
+      - name: APP_COLOR 
+        valueFrom:
+          secretKeyRef:
+            name: app-config
+            key: APP_COLOR
+    # plain key-value
+      - name: APP-COLOR
+        value: pink
+    # from configmap
+      - name: APP_COLOR
+        valueFrom:
+          configMapKeyRef:
+            name: app-config
+            key: APP_COLOR
+      
+    envFrom:
+      - configMapRef:
+          name: app-config
+    volumes:
+      - name: app-config-volume
+        configMap:
+          name: app-config
+    
