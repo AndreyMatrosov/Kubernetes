@@ -1,0 +1,12 @@
+terraform init
+terraform plan
+terraform plan -out=file_name 
+terraform apply
+terraform destroy
+terraform output 
+
+export AWS_ACCESS_KEY=AKIARUMZMQMN4IKLJL5L
+export  AWS_SECRET_KEY=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
+export AWS_DEFAULT_REGION=us-east-2
+
+terraform console
